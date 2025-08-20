@@ -8,7 +8,7 @@
     "vite": "^7.1.2"
   },
   "scripts": {
-    "license": "license-checker --json --production --out LICENSES.json --relativeLicensePath",
+    "license": "license-checker --production --out LICENSES.txt --relativeLicensePath",
     "build": "npm run license && vite build",
     "dev": "vite build --watch"
   }

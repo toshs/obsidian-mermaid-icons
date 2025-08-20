@@ -1,6 +1,5 @@
 import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import * as LICENSES from "../LICENSES.json";
 
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
