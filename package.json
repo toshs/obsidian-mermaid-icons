@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0"
+  },
+  "devDependencies": {
+    "license-checker": "^25.0.1",
+    "obsidian": "^1.8.7",
+    "vite": "^7.1.2"
+  },
+  "scripts": {
+    "license": "license-checker --json --production --out LICENSES.json --relativeLicensePath",
+    "build": "npm run license && vite build",
+    "dev": "vite build --watch"
+  }
+}
