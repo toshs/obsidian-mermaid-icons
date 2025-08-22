@@ -6,21 +6,21 @@ import { icons } from "@iconify-json/logos";
 declare const __LICENSE_TEXT__: string;
 
 // --- Settings Interfaces ---
-interface MyPluginSettings {
+interface MermaidIconsSettings {
   loadingMethod: "js" | "css";
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: MermaidIconsSettings = {
   loadingMethod: "css", // 'js' (SVG/JS) or 'css' (Webfont/CSS)
 };
 
 // --- Main Plugin Class ---
 export default class MermaidIconsPlugin extends Plugin {
-  settings: MyPluginSettings;
+  settings: MermaidIconsSettings;
   styleEl: HTMLElement;
 
   async onload() {
-    this.addSettingTab(new MyPluginSettingTab(this.app, this));
+    this.addSettingTab(new MermaidIconsSettingTab(this.app, this));
     const mermaid = await loadMermaid();
     mermaid.registerIconPacks([
       {
@@ -32,7 +32,6 @@ export default class MermaidIconsPlugin extends Plugin {
 
   onunload() {
     // Unload styles and attempt to clean up
-    console.log("Unloading Font Awesome Plugin");
   }
 
   async loadSettings() {
@@ -45,7 +44,7 @@ export default class MermaidIconsPlugin extends Plugin {
 }
 
 // --- Setting Tab Class ---
-class MyPluginSettingTab extends PluginSettingTab {
+class MermaidIconsSettingTab extends PluginSettingTab {
   plugin: MermaidIconsPlugin;
 
   constructor(app: App, plugin: MermaidIconsPlugin) {
@@ -57,7 +56,7 @@ class MyPluginSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h1", { text: "Mermaid Icons Settings" });
+    containerEl.createEl("h1", { text: "Mermaid Icons" });
 
     // --- License Information ---
     containerEl.createEl("h3", { text: "Licenses" });
