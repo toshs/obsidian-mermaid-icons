@@ -27,7 +27,8 @@ jobs:
         id: package
         run: |
           id=$(jq -r .id manifest.json)
-          zip -r "${id}.zip" dist/
+          cp -r dist "${id}"
+          zip -r "${id}.zip" "${id}/"
           echo "zip_name=${id}.zip" >> $GITHUB_OUTPUT
 
       - name: Create release
