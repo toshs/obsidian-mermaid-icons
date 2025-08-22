@@ -1,5 +1,7 @@
 # Obsidian Mermaid Icons Plugin
 
+![An example diagrams](./images/example_diagrams.png)
+
 This plugin for [Obsidian](https://obsidian.md) allows you to easily use a wide variety of icons within your [Mermaid](https://mermaid-js.github.io/mermaid/#/) diagrams.
 
 It not only ensures that the default Font Awesome icons render correctly but also extends functionality to include other icons.
@@ -31,7 +33,14 @@ graph LR
 
     A --> B --> C --> D
 ```
+````
 
+This will render a diagram with the corresponding [Font Awesome icons](https://fontawesome.com/icons).
+
+![An example flowchart diagrams](./images/example_diagrams_flowchart.png)
+
+
+````
 ```mermaid
 architecture-beta
     group api(logos:aws-lambda)[API]
@@ -47,9 +56,9 @@ architecture-beta
 ```
 ````
 
-This will render a diagram with the corresponding icons.
+This will render a diagram with the corresponding [SVG Logos Icon sets](https://icon-sets.iconify.design/logos/).
 
-![An example diagrams](./images/example_diagrams.png)
+![An example architecture diagrams](./images/example_diagrams_architecture.png)
 
 ## Installation
 

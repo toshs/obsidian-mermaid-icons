@@ -1,5 +1,7 @@
 # Obsidian Mermaid Icons Plugin
 
+![使用例](./images/example_diagrams.png)
+
 このプラグインは、[Obsidian](https://obsidian.md)の[Mermaid](https://mermaid-js.github.io/mermaid/#/)ダイアグラム内で、さまざまなアイコンを簡単に使用できるようにするものです。
 
 デフォルトでサポートされているFont Awesomeアイコンが正しく表示されるようにするだけでなく、他のアイコンも使用できるように機能を拡張します。
@@ -31,7 +33,13 @@ graph LR
 
     A --> B --> C --> D
 ```
+````
 
+これにより、対応する[Font Awesomeアイコン](https://fontawesome.com/icons)がMermaid中で表示されます。
+
+![フローチャート図の例](./images/example_diagrams_flowchart.png)
+
+````
 ```mermaid
 architecture-beta
     group api(logos:aws-lambda)[API]
@@ -47,9 +55,9 @@ architecture-beta
 ```
 ````
 
-これにより、対応するアイコンが表示されたダイアグラムがレンダリングされます。
+これにより、対応する[SVG Logos Iconのセット](https://icon-sets.iconify.design/logos/)がMermaid中で表示されます。
 
-![使用例](./images/example_diagrams.png)
+![アーキテクチャ図の例](./images/example_diagrams_architecture.png)
 
 ## インストール方法
 
@@ -72,7 +80,7 @@ architecture-beta
 
 ## 仕組み
 
-このプラグインは、Obsidian内のMermaidにおけるIconを2つの方法で利用可能にします。
+このプラグインは、Obsidian内のMermaidにおいて、2つの方法でアイコンを利用可能にします。
 
 1.  **Font Awesomeアイコンの表示修正:** Mermaidで `fa:fa-icon` という構文を使うと、対応するHTMLタグ（例: `<i class="fa fa-icon">`）が生成されます。しかし、Obsidianの標準状態ではFont Awesomeのスタイルシートやフォントファイルが含まれていません。このプラグインは、それらの必要なアセットを読み込むことで、アイコンが意図通りに表示されるようにします。
 
