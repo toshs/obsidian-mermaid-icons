@@ -72,9 +72,9 @@ architecture-beta
 
 ### 手動インストール
 
-1.  GitHubの最新の[Releases](https://github.com/toshs/obsidian-mermaid-icons/releases)ページから `obsidian-mermaid-icons.zip` をダウンロードします。
+1.  GitHubの最新の[Releases](https://github.com/toshs/obsidian-mermaid-icons/releases)ページから `mermaid-icons.zip` をダウンロードします。
 2.  ダウンロードしたzipファイルの中身を展開します。
-3.  展開した`obsidian-mermaid-icons`フォルダを、お使いのObsidian vaultのプラグインフォルダに移動します: `<YourVault>/.obsidian/plugins/`。
+3.  展開した`mermaid-icons`フォルダを、お使いのObsidian vaultのプラグインフォルダに移動します: `<YourVault>/.obsidian/plugins/`。
 4.  Obsidianをリロードします。
 5.  **設定** -> **コミュニティプラグイン**に移動し、「Mermaid Icons」を有効にします。
 

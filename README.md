@@ -73,9 +73,9 @@ This will render a diagram with the corresponding [SVG Logos Icon sets](https://
 
 ### Manual Installation
 
-1.  Download `obsidian-mermaid-icons.zip` from the latest [Releases](https://github.com/toshs/obsidian-mermaid-icons/releases) page on GitHub.
+1.  Download `mermaid-icons.zip` from the latest [Releases](https://github.com/toshs/obsidian-mermaid-icons/releases) page on GitHub.
 2.  Extract the contents of the downloaded zip file.
-3.  Move the extracted `obsidian-mermaid-icons` folder to your Obsidian vault's plugins folder: `<YourVault>/.obsidian/plugins/`.
+3.  Move the extracted `mermaid-icons` folder to your Obsidian vault's plugins folder: `<YourVault>/.obsidian/plugins/`.
 4.  Reload Obsidian.
 5.  Go to **Settings** -> **Community plugins**, and enable "Mermaid Icons".
 
