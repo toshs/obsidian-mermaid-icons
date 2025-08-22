@@ -23,6 +23,13 @@ jobs:
           npm install
           npm run build
 
+      - name: Package plugin
+        id: package
+        run: |
+          id=$(jq -r .id manifest.json)
+          zip -r "${id}.zip" dist/
+          echo "zip_name=${id}.zip" >> $GITHUB_OUTPUT
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,4 +39,4 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            dist/*
+            dist/* "${{ steps.package.outputs.zip_name }}"
