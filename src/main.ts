@@ -1,5 +1,6 @@
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, loadMermaid } from "obsidian";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { icons } from "@iconify-json/logos";
 
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
@@ -20,6 +21,13 @@ export default class MermaidIconsPlugin extends Plugin {
 
   async onload() {
     this.addSettingTab(new MyPluginSettingTab(this.app, this));
+    const mermaid = await loadMermaid();
+    mermaid.registerIconPacks([
+      {
+        name: icons.prefix,
+        icons: icons,
+      },
+    ]);
   }
 
   onunload() {
