@@ -56,10 +56,9 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h1", { text: "Mermaid Icons" });
 
     // --- License Information ---
-    containerEl.createEl("h3", { text: "Licenses" });
+    new Setting(containerEl).setName("Licenses").setHeading();
     containerEl.createEl("p", {
       text: "This plugin uses the following third-party libraries:",
     });
