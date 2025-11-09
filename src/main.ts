@@ -5,18 +5,8 @@ import { icons } from "@iconify-json/logos";
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
 
-// --- Settings Interfaces ---
-interface MermaidIconsSettings {
-  loadingMethod: "js" | "css";
-}
-
-const DEFAULT_SETTINGS: MermaidIconsSettings = {
-  loadingMethod: "css", // 'js' (SVG/JS) or 'css' (Webfont/CSS)
-};
-
 // --- Main Plugin Class ---
 export default class MermaidIconsPlugin extends Plugin {
-  settings: MermaidIconsSettings;
   styleEl: HTMLElement;
 
   async onload() {
@@ -33,14 +23,6 @@ export default class MermaidIconsPlugin extends Plugin {
   onunload() {
     // Unload styles and attempt to clean up
   }
-
-  async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-  }
-
-  async saveSettings() {
-    await this.saveData(this.settings);
-  }
 }
 
 // --- Setting Tab Class ---
@@ -55,7 +37,6 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-
 
     // --- License Information ---
     new Setting(containerEl).setName("Licenses").setHeading();
