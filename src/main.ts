@@ -1,4 +1,15 @@
-import { App, Plugin, PluginSettingTab, Setting, loadMermaid } from "obsidian";
+import {
+  App,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  loadMermaid,
+  FuzzySuggestModal,
+  Editor,
+  MarkdownView,
+  editorViewField,
+  editorEditorField,
+} from "obsidian";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
 import { icons as lucide } from "@iconify-json/lucide";
@@ -26,10 +37,203 @@ export default class MermaidIconsPlugin extends Plugin {
     this.addSettingTab(new MermaidIconsSettingTab(this.app, this));
     const mermaid = await loadMermaid();
     mermaid.registerIconPacks(IconPacks);
+
+    // Register markdown post processor for icon preview
+    this.registerMarkdownPostProcessor((element, context) => {
+      const codeBlocks = element.querySelectorAll("code");
+      console.log(codeBlocks);
+      codeBlocks.forEach((code) => {
+        console.log(code);
+        const text = code.textContent || "";
+        const matches = text.matchAll(/(logos|lucide):([\w-]+)/g);
+        for (const match of matches) {
+          const prefix = match[1];
+          const name = match[2];
+          console.log("match", match, prefix, name)
+          const iconData = this.getIconData(prefix, name);
+          console.log(iconData)
+          if (iconData && iconData.body) {
+            let w = iconData.width;
+            let h = iconData.height;
+
+            if (!w && !h) {
+              w = 32;
+              h = 32;
+            } else if (!w) {
+              w = h;
+            } else if (!h) {
+              h = w;
+            }
+
+            const left = iconData.left ?? 0;
+            const top = iconData.top ?? 0;
+            const viewBox = `${left} ${top} ${w} ${h}`;
+
+            const iconSpan = createSpan({
+              cls: "mermaid-icon-preview-inline",
+            });
+            iconSpan.style.display = "inline-flex";
+            iconSpan.style.alignItems = "center";
+            iconSpan.style.verticalAlign = "middle";
+            iconSpan.style.marginRight = "4px";
+            iconSpan.style.width = "16px";
+            iconSpan.style.height = "16px";
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="16" height="16" preserveAspectRatio="xMidYMid meet" style="width:16px; height:16px; display:block;">${iconData.body}</svg>`;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (iconSpan as any).innerHTML = svg;
+
+            code.parentNode?.insertBefore(iconSpan, code);
+          }
+        }
+      });
+    });
+
+    this.addCommand({
+      id: "insert-mermaid-icon",
+      name: "Insert Mermaid Icon",
+      hotkeys: [
+        {
+          modifiers: ["Mod", "Shift"],
+          key: "i",
+        },
+      ],
+      editorCallback: (editor: Editor, _view: MarkdownView) => {
+        new IconModal(this.app, this, (iconStr) => {
+          editor.replaceSelection(iconStr);
+        }).open();
+      },
+    });
   }
 
   onunload() {
     // Unload styles and attempt to clean up
+  }
+
+  getAllIcons() {
+    const allIcons: Array<{ prefix: string; name: string }> = [];
+    IconPacks.forEach((pack) => {
+      Object.keys(pack.icons.icons).forEach((iconName) => {
+        allIcons.push({ prefix: pack.name, name: iconName });
+      });
+    });
+    return allIcons;
+  }
+
+  // Find the raw icon data (body/width/height) from the IconPacks by prefix/name
+  getIconData(prefix: string, name: string) {
+    const pack = IconPacks.find((p) => p.name === prefix);
+    if (!pack) return null;
+    // The Iconify JSON packs store icons under `icons` property
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const icon = (pack.icons as any).icons?.[name];
+    if (!icon) return null;
+
+    // Resolve dimensions: Icon > Pack Default > Fallback (shouldn't happen if packs are well-formed)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const packIcons = pack.icons as any;
+    const width = icon.width ?? packIcons.width ?? 0;
+    const height = icon.height ?? packIcons.height ?? 0;
+
+    return {
+      ...icon,
+      width,
+      height,
+    };
+  }
+}
+
+// --- Icon Modal Class ---
+class IconModal extends FuzzySuggestModal<{ prefix: string; name: string }> {
+  plugin: MermaidIconsPlugin;
+  onChoose: (result: string) => void;
+
+  constructor(
+    app: App,
+    plugin: MermaidIconsPlugin,
+    onChoose: (result: string) => void,
+  ) {
+    super(app);
+    this.plugin = plugin;
+    this.onChoose = onChoose;
+    this.setPlaceholder("Search icons...");
+  }
+
+  getItems(): { prefix: string; name: string }[] {
+    return this.plugin.getAllIcons();
+  }
+
+  getItemText(item: { prefix: string; name: string }): string {
+    return `${item.prefix}:${item.name}`;
+  }
+
+  renderSuggestion(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    item: { item: { prefix: string; name: string }; match: any },
+    el: HTMLElement,
+  ) {
+    super.renderSuggestion(item, el);
+
+    // Extract the text/highlight elements created by super.renderSuggestion
+    const textContent = [];
+    while (el.firstChild) {
+      textContent.push(el.firstChild);
+      el.removeChild(el.firstChild);
+    }
+
+    el.style.display = "flex";
+    el.style.alignItems = "center";
+    el.style.justifyContent = "flex-start"; // Align left
+
+    // Create a container for the icon preview
+    const iconContainer = el.createDiv();
+    iconContainer.style.width = "32px";
+    iconContainer.style.height = "32px";
+    iconContainer.style.marginRight = "10px";
+    iconContainer.style.display = "flex";
+    iconContainer.style.alignItems = "center";
+    iconContainer.style.justifyContent = "center";
+    iconContainer.style.flexShrink = "0"; // Prevent icon from shrinking
+
+    // Create a container for the text
+    const textContainer = el.createDiv();
+    textContainer.style.display = "block"; // Standard block layout for text
+    textContainer.style.whiteSpace = "nowrap";
+    textContainer.style.overflow = "hidden";
+    textContainer.style.textOverflow = "ellipsis";
+
+    // Re-append text nodes
+    textContent.forEach((node) => textContainer.appendChild(node));
+
+    const iconData = this.plugin.getIconData(item.item.prefix, item.item.name);
+    if (iconData && iconData.body) {
+      let w = iconData.width;
+      let h = iconData.height;
+
+      // Fallback logic if still 0 (though pack defaults should cover this)
+      if (!w && !h) {
+        w = 32;
+        h = 32;
+      } else if (!w) {
+        w = h;
+      } else if (!h) {
+        h = w;
+      }
+
+      const left = iconData.left ?? 0;
+      const top = iconData.top ?? 0;
+      const viewBox = `${left} ${top} ${w} ${h}`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (iconContainer as any).innerHTML = svg;
+    }
+  }
+
+  onChooseItem(
+    item: { prefix: string; name: string },
+    _evt: MouseEvent | KeyboardEvent,
+  ): void {
+    this.onChoose(`${item.prefix}:${item.name}`);
   }
 }
 
@@ -48,7 +252,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   constructor(app: App, plugin: MermaidIconsPlugin) {
     super(app, plugin);
     this.plugin = plugin;
-    this.allIcons = this.getAllIcons();
+    this.allIcons = this.plugin.getAllIcons();
     this.filteredIcons = this.allIcons;
     this.fuse = new Fuse(this.allIcons, {
       keys: ["name", "prefix"],
@@ -71,7 +275,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
           this.searchDebounceTimer = window.setTimeout(() => {
             this.handleSearch(value);
           }, 300);
-        })
+        }),
       );
 
     // Container for the grid
@@ -121,16 +325,6 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     licensesEl.setText(__LICENSE_TEXT__);
   }
 
-  getAllIcons() {
-    const allIcons: Array<{ prefix: string; name: string }> = [];
-    IconPacks.forEach((pack) => {
-      Object.keys(pack.icons.icons).forEach((iconName) => {
-        allIcons.push({ prefix: pack.name, name: iconName });
-      });
-    });
-    return allIcons;
-  }
-
   handleSearch(filter: string) {
     if (!filter) {
       this.filteredIcons = this.allIcons;
@@ -142,16 +336,6 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     this.renderIcons(true);
   }
 
-  // Find the raw icon data (body/width/height) from the IconPacks by prefix/name
-  getIconData(prefix: string, name: string) {
-    const pack = IconPacks.find((p) => p.name === prefix);
-    if (!pack) return null;
-    // The Iconify JSON packs store icons under `icons` property
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const icon = (pack.icons as any).icons?.[name];
-    return icon ?? null;
-  }
-
   renderIcons(reset: boolean) {
     if (!this.iconsContainer) return;
 
@@ -161,7 +345,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
 
     const iconsToShow = this.filteredIcons.slice(
       reset ? 0 : this.iconsContainer.childElementCount,
-      this.currentLimit
+      this.currentLimit,
     );
 
     iconsToShow.forEach((icon) => {
@@ -185,21 +369,23 @@ class MermaidIconsSettingTab extends PluginSettingTab {
       iconWrapper.style.alignItems = "center";
       iconWrapper.style.justifyContent = "center";
 
-      const iconData = this.getIconData(icon.prefix, icon.name);
+      const iconData = this.plugin.getIconData(icon.prefix, icon.name);
       if (iconData && iconData.body) {
         let w = iconData.width;
         let h = iconData.height;
 
         if (!w && !h) {
-          w = 256;
-          h = 256;
+          w = 32;
+          h = 32;
         } else if (!w) {
           w = h;
         } else if (!h) {
           h = w;
         }
 
-        const viewBox = `0 0 ${w} ${h}`;
+        const left = iconData.left ?? 0;
+        const top = iconData.top ?? 0;
+        const viewBox = `${left} ${top} ${w} ${h}`;
         // Force 32x32 display size
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
