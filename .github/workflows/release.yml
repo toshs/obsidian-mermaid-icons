@@ -39,5 +39,6 @@ jobs:
 
           gh release create "$tag" \
             --title="$tag" \
+            --generate-notes \
             --draft \
             dist/* "${{ steps.package.outputs.zip_name }}"
