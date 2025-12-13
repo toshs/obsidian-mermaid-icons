@@ -9,7 +9,9 @@ It not only ensures that the default Font Awesome icons render correctly but als
 ## Features
 
 - **Font Awesome Support:** Correctly displays Font Awesome icons in mermaid diagrams, which are defaultly supported by Mermaid but not to be rendered properly in Obsidian.
-- **Expanded Icon Sets:** Adds support for additional icons, including popular icons and logos.
+- **Expanded Icon Sets:** Adds support for additional icons, including popular icons, logos, and Lucide icons.
+- **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal (`Cmd+Shift+i`).
+- **Icon Browser:** Browse and filter all supported icons directly from the plugin settings.
 
 ## How to Use
 
@@ -17,7 +19,15 @@ To include an icon in your Mermaid diagram, use the following syntax:
 
 - `fa[bklrs]?:[icon-name]` for Font Awesome icons.
 - `[prefix]:[icon-name]` for other custom icons.
-  - `logos:[icon-name]` is now only supported.
+  - Supported prefixes: `logos`, `lucide`.
+
+### Insert Icon Command
+
+You can easily insert icons using the "Insert Mermaid Icon" command:
+
+1.  Press `Cmd+Shift+i` (or `Ctrl+Shift+i` on Windows/Linux) while in the editor.
+2.  Type to search for an icon.
+3.  Select an icon to insert it into your document.
 
 ### Example
 
@@ -60,6 +70,12 @@ This will render a diagram with the corresponding [SVG Logos Icon sets](https://
 
 ![An example architecture diagrams](./images/example_diagrams_architecture.png)
 
+## Settings
+
+In the plugin settings, you can browse all supported icons under the **Supported icons** section.
+- Use the dropdown to filter by icon set (e.g., `logos`, `lucide`).
+- Use the search bar to find specific icons by name.
+
 ## Installation
 
 ### From Community Plugins
@@ -101,6 +117,6 @@ This plugin utilizes the following open-source icon sets. Thank you to their cre
   - **Fonts:** Licensed under [SIL OFL 1.1](https://scripts.sil.org/OFL).
   - **Code:** Licensed under [MIT License](https://opensource.org/licenses/MIT).
 
-- **[Iconify](https://iconify.design/) / [SVG Logos](https://github.com/gilbarbara/logos)**
-  - The logos icon set (`@iconify-json/logos`) is sourced from the `gilbarbara/logos` project, which is licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
-  - Please note that all logos are trademarks of their respective owners.
+- **[Iconify](https://iconify.design/)**
+  - **[SVG Logos](https://github.com/gilbarbara/logos)** (`logos`): Licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+  - **[Lucide](https://lucide.dev/)** (`lucide`): Licensed under [ISC License](https://opensource.org/licenses/ISC).

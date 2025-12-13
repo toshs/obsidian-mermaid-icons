@@ -9,7 +9,9 @@
 ## 主な機能
 
 -   **Font Awesomeサポート:** MermaidでデフォルトでサポートされていながらObsidianでは正しく表示されないFont Awesomeアイコンを正常に表示します。
--   **拡張アイコンセット:** 人気のアイコンやロゴなど、追加のアイコンをサポートします。
+-   **拡張アイコンセット:** 人気のアイコンやロゴ、Lucideアイコンなど、追加のアイコンをサポートします。
+-   **アイコン入力支援:** ファジー検索モーダル (`Cmd+Shift+i`) を使用して、アイコンを簡単に検索・挿入できます。
+-   **アイコンブラウザ:** プラグイン設定画面から、サポートされているすべてのアイコンを閲覧・フィルタリングできます。
 
 ## 使い方
 
@@ -17,7 +19,15 @@ Mermaidダイアグラムにアイコンを含めるには、次の構文を使�
 
 -   Font Awesomeアイコンの場合: `fa[bklrs]?:[icon-name]`
 -   その他のカスタムアイコンの場合: `[prefix]:[icon-name]`
-    -   現在は `logos:[icon-name]` のみサポートしています。
+    -   サポートされているプレフィックス: `logos`, `lucide`
+
+### アイコン挿入コマンド
+
+「Insert Mermaid Icon」コマンドを使用して、簡単にアイコンを挿入できます。
+
+1.  エディタ内で `Cmd+Shift+i` (Windows/Linuxの場合は `Ctrl+Shift+i`) を押します。
+2.  アイコン名を入力して検索します。
+3.  アイコンを選択してドキュメントに挿入します。
 
 ### 使用例
 
@@ -59,6 +69,12 @@ architecture-beta
 
 ![アーキテクチャ図の例](./images/example_diagrams_architecture.png)
 
+## 設定
+
+プラグイン設定の **Supported icons** セクションで、サポートされているすべてのアイコンを閲覧できます。
+-   ドロップダウンを使用して、アイコンセット（例: `logos`, `lucide`）でフィルタリングできます。
+-   検索バーを使用して、名前で特定のアイコンを検索できます。
+
 ## インストール方法
 
 ### コミュニティプラグインから
@@ -99,6 +115,6 @@ architecture-beta
     -   **フォント:** [SIL OFL 1.1](https://scripts.sil.org/OFL) ライセンス
     -   **コード:** [MIT License](https://opensource.org/licenses/MIT) ライセンス
 
--   **[Iconify](https://iconify.design/) / [SVG Logos](https://github.com/gilbarbara/logos)**
-    -   ロゴのアイコンセット（`@iconify-json/logos`）は `gilbarbara/logos` プロジェクトをソースとしており、これは [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) ライセンスです。
-    -   すべてのロゴは、それぞれの所有者の商標であることにご注意ください。
+-   **[Iconify](https://iconify.design/)**
+    -   **[SVG Logos](https://github.com/gilbarbara/logos)** (`logos`): [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) ライセンス
+    -   **[Lucide](https://lucide.dev/)** (`lucide`): [ISC License](https://opensource.org/licenses/ISC) ライセンス
