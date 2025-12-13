@@ -9,7 +9,7 @@ It not only ensures that the default Font Awesome icons render correctly but als
 ## Features
 
 - **Font Awesome Support:** Correctly displays Font Awesome icons in mermaid diagrams, which are defaultly supported by Mermaid but not to be rendered properly in Obsidian.
-- **Expanded Icon Sets:** Adds support for additional icons, including popular icons, logos, and Lucide icons.
+- **Expanded Icon Sets:** Adds support for additional icons **pre-bundled with the plugin**, including popular icons, logos, and Lucide icons. (If you want to add more icon sets, please submit a Pull Request!)
 - **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal (`Cmd+Shift+i`).
 - **Icon Browser:** Browse and filter all supported icons directly from the plugin settings.
 
