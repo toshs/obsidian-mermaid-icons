@@ -7,8 +7,6 @@ import {
   FuzzySuggestModal,
   Editor,
   MarkdownView,
-  editorViewField,
-  editorEditorField,
 } from "obsidian";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
@@ -39,7 +37,7 @@ export default class MermaidIconsPlugin extends Plugin {
     mermaid.registerIconPacks(IconPacks);
 
     // Register markdown post processor for icon preview
-    this.registerMarkdownPostProcessor((element, context) => {
+    this.registerMarkdownPostProcessor((element, _context) => {
       const codeBlocks = element.querySelectorAll("code");
       console.log(codeBlocks);
       codeBlocks.forEach((code) => {
@@ -49,9 +47,7 @@ export default class MermaidIconsPlugin extends Plugin {
         for (const match of matches) {
           const prefix = match[1];
           const name = match[2];
-          console.log("match", match, prefix, name)
           const iconData = this.getIconData(prefix, name);
-          console.log(iconData)
           if (iconData && iconData.body) {
             let w = iconData.width;
             let h = iconData.height;
@@ -248,16 +244,30 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   private loadMoreButton: HTMLButtonElement | null = null;
   private searchDebounceTimer: number | null = null;
   private fuse: Fuse<{ prefix: string; name: string }> | null = null;
+  private searchInput: HTMLInputElement | null = null; // Keep track of search input
+  private selectedPack = "all";
 
   constructor(app: App, plugin: MermaidIconsPlugin) {
     super(app, plugin);
     this.plugin = plugin;
+    this.refreshIconList();
+  }
+
+  refreshIconList() {
     this.allIcons = this.plugin.getAllIcons();
     this.filteredIcons = this.allIcons;
     this.fuse = new Fuse(this.allIcons, {
       keys: ["name", "prefix"],
       threshold: 0.4,
     });
+    // Re-apply search if exists
+    if (this.searchInput && this.searchInput.value) {
+      this.handleSearch(this.searchInput.value);
+    } else {
+      this.filteredIcons = this.allIcons;
+      this.currentLimit = this.batchSize;
+      this.renderIcons(true);
+    }
   }
 
   display(): void {
@@ -267,7 +277,17 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Supported icons")
       .setHeading()
-      .addText((text) =>
+      .addDropdown((dropdown) => {
+        dropdown.addOption("all", "All");
+        IconPacks.forEach((pack) => dropdown.addOption(pack.name, pack.name));
+        dropdown.setValue(this.selectedPack);
+        dropdown.onChange((value) => {
+          this.selectedPack = value;
+          this.handleSearch(this.searchInput?.value || "");
+        });
+      })
+      .addText((text) => {
+        this.searchInput = text.inputEl;
         text.setPlaceholder("Filter icons...").onChange((value) => {
           if (this.searchDebounceTimer) {
             window.clearTimeout(this.searchDebounceTimer);
@@ -275,8 +295,8 @@ class MermaidIconsSettingTab extends PluginSettingTab {
           this.searchDebounceTimer = window.setTimeout(() => {
             this.handleSearch(value);
           }, 300);
-        }),
-      );
+        });
+      });
 
     // Container for the grid
     this.iconsContainer = containerEl.createDiv("icons-grid-container");
@@ -326,12 +346,18 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   }
 
   handleSearch(filter: string) {
-    if (!filter) {
-      this.filteredIcons = this.allIcons;
-    } else {
-      const results = this.fuse?.search(filter);
-      this.filteredIcons = results ? results.map((r) => r.item) : [];
+    let results = this.allIcons;
+
+    if (filter) {
+      const fuseResults = this.fuse?.search(filter);
+      results = fuseResults ? fuseResults.map((r) => r.item) : [];
     }
+
+    if (this.selectedPack !== "all") {
+      results = results.filter((icon) => icon.prefix === this.selectedPack);
+    }
+
+    this.filteredIcons = results;
     this.currentLimit = this.batchSize;
     this.renderIcons(true);
   }
