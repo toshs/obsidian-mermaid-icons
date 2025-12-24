@@ -10,7 +10,7 @@ It not only ensures that the default Font Awesome icons render correctly but als
 
 - **Font Awesome Support:** Correctly displays Font Awesome icons in mermaid diagrams, which are defaultly supported by Mermaid but not to be rendered properly in Obsidian.
 - **Expanded Icon Sets:** Adds support for additional icons **pre-bundled with the plugin**, including popular icons, logos, and Lucide icons. (If you want to add more icon sets, please submit a Pull Request!)
-- **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal (`Cmd+Shift+i`).
+- **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal (`Cmd+Shift+m`).
 - **Icon Browser:** Browse and filter all supported icons directly from the plugin settings.
 
 ## How to Use
@@ -25,7 +25,7 @@ To include an icon in your Mermaid diagram, use the following syntax:
 
 You can easily insert icons using the "Insert Mermaid Icon" command:
 
-1.  Press `Cmd+Shift+i` (or `Ctrl+Shift+i` on Windows/Linux) while in the editor.
+1.  Press `Cmd+Shift+m` (or `Ctrl+Shift+m` on Windows/Linux) while in the editor.
 2.  Type to search for an icon.
 3.  Select an icon to insert it into your document.
 

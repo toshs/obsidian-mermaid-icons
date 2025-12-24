@@ -8,6 +8,7 @@ import {
   Editor,
   MarkdownView,
 } from "obsidian";
+import "../styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
 import { icons as lucide } from "@iconify-json/lucide";
@@ -16,14 +17,33 @@ import Fuse from "fuse.js";
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
 
-const IconPacks = [
+interface IconifyIcon {
+  body: string;
+  width?: number;
+  height?: number;
+  left?: number;
+  top?: number;
+}
+
+interface IconifyJSON {
+  prefix: string;
+  icons: Record<string, IconifyIcon>;
+  width?: number;
+  height?: number;
+}
+
+interface Mermaid {
+  registerIconPacks: (packs: { name: string; icons: unknown }[]) => void;
+}
+
+const IconPacks: Array<{ name: string; icons: IconifyJSON }> = [
   {
     name: logos.prefix,
-    icons: logos,
+    icons: logos as unknown as IconifyJSON,
   },
   {
     name: lucide.prefix,
-    icons: lucide,
+    icons: lucide as unknown as IconifyJSON,
   },
 ];
 
@@ -33,15 +53,13 @@ export default class MermaidIconsPlugin extends Plugin {
 
   async onload() {
     this.addSettingTab(new MermaidIconsSettingTab(this.app, this));
-    const mermaid = await loadMermaid();
+    const mermaid = (await loadMermaid()) as Mermaid;
     mermaid.registerIconPacks(IconPacks);
 
     // Register markdown post processor for icon preview
     this.registerMarkdownPostProcessor((element, _context) => {
       const codeBlocks = element.querySelectorAll("code");
-      console.log(codeBlocks);
       codeBlocks.forEach((code) => {
-        console.log(code);
         const text = code.textContent || "";
         const matches = text.matchAll(/(logos|lucide):([\w-]+)/g);
         for (const match of matches) {
@@ -65,19 +83,12 @@ export default class MermaidIconsPlugin extends Plugin {
             const top = iconData.top ?? 0;
             const viewBox = `${left} ${top} ${w} ${h}`;
 
-            const iconSpan = createSpan({
-              cls: "mermaid-icon-preview-inline",
-            });
-            iconSpan.style.display = "inline-flex";
-            iconSpan.style.alignItems = "center";
-            iconSpan.style.verticalAlign = "middle";
-            iconSpan.style.marginRight = "4px";
-            iconSpan.style.width = "16px";
-            iconSpan.style.height = "16px";
+            const iconSpan = document.createElement("span");
+            iconSpan.addClass("mermaid-icon-preview-inline");
 
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="16" height="16" preserveAspectRatio="xMidYMid meet" style="width:16px; height:16px; display:block;">${iconData.body}</svg>`;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (iconSpan as any).innerHTML = svg;
+            // eslint-disable-next-line @microsoft/sdl/no-inner-html
+            iconSpan.innerHTML = svg;
 
             code.parentNode?.insertBefore(iconSpan, code);
           }
@@ -87,11 +98,12 @@ export default class MermaidIconsPlugin extends Plugin {
 
     this.addCommand({
       id: "insert-mermaid-icon",
-      name: "Insert Mermaid Icon",
+      name: "Insert Mermaid icon",
+      // eslint-disable-next-line obsidianmd/commands/no-default-hotkeys
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
-          key: "i",
+          key: "m",
         },
       ],
       editorCallback: (editor: Editor, _view: MarkdownView) => {
@@ -121,13 +133,11 @@ export default class MermaidIconsPlugin extends Plugin {
     const pack = IconPacks.find((p) => p.name === prefix);
     if (!pack) return null;
     // The Iconify JSON packs store icons under `icons` property
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const icon = (pack.icons as any).icons?.[name];
+    const icon = pack.icons.icons?.[name];
     if (!icon) return null;
 
     // Resolve dimensions: Icon > Pack Default > Fallback (shouldn't happen if packs are well-formed)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const packIcons = pack.icons as any;
+    const packIcons = pack.icons;
     const width = icon.width ?? packIcons.width ?? 0;
     const height = icon.height ?? packIcons.height ?? 0;
 
@@ -177,26 +187,13 @@ class IconModal extends FuzzySuggestModal<{ prefix: string; name: string }> {
       el.removeChild(el.firstChild);
     }
 
-    el.style.display = "flex";
-    el.style.alignItems = "center";
-    el.style.justifyContent = "flex-start"; // Align left
+    el.addClass("mermaid-icon-suggestion");
 
     // Create a container for the icon preview
-    const iconContainer = el.createDiv();
-    iconContainer.style.width = "32px";
-    iconContainer.style.height = "32px";
-    iconContainer.style.marginRight = "10px";
-    iconContainer.style.display = "flex";
-    iconContainer.style.alignItems = "center";
-    iconContainer.style.justifyContent = "center";
-    iconContainer.style.flexShrink = "0"; // Prevent icon from shrinking
+    const iconContainer = el.createDiv("mermaid-icon-suggestion-icon");
 
     // Create a container for the text
-    const textContainer = el.createDiv();
-    textContainer.style.display = "block"; // Standard block layout for text
-    textContainer.style.whiteSpace = "nowrap";
-    textContainer.style.overflow = "hidden";
-    textContainer.style.textOverflow = "ellipsis";
+    const textContainer = el.createDiv("mermaid-icon-suggestion-text");
 
     // Re-append text nodes
     textContent.forEach((node) => textContainer.appendChild(node));
@@ -220,8 +217,8 @@ class IconModal extends FuzzySuggestModal<{ prefix: string; name: string }> {
       const top = iconData.top ?? 0;
       const viewBox = `${left} ${top} ${w} ${h}`;
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (iconContainer as any).innerHTML = svg;
+      // eslint-disable-next-line @microsoft/sdl/no-inner-html
+      iconContainer.innerHTML = svg;
     }
   }
 
@@ -279,6 +276,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
       .setHeading()
       .addDropdown((dropdown) => {
         dropdown.addOption("all", "All");
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         IconPacks.forEach((pack) => dropdown.addOption(pack.name, pack.name));
         dropdown.setValue(this.selectedPack);
         dropdown.onChange((value) => {
@@ -300,24 +298,13 @@ class MermaidIconsSettingTab extends PluginSettingTab {
 
     // Container for the grid
     this.iconsContainer = containerEl.createDiv("icons-grid-container");
-    this.iconsContainer.style.display = "grid";
-    this.iconsContainer.style.gridTemplateColumns =
-      "repeat(auto-fill, minmax(100px, 1fr))";
-    this.iconsContainer.style.gap = "10px";
-    this.iconsContainer.style.maxHeight = "60vh";
-    this.iconsContainer.style.overflowY = "auto";
-    this.iconsContainer.style.padding = "10px";
-    this.iconsContainer.style.border =
-      "1px solid var(--background-modifier-border)";
-    this.iconsContainer.style.borderRadius = "4px";
 
     // Load More Button
     const btnContainer = containerEl.createDiv();
-    btnContainer.style.textAlign = "center";
-    btnContainer.style.marginTop = "10px";
+    btnContainer.setCssProps({ "text-align": "center", "margin-top": "10px" });
 
     this.loadMoreButton = btnContainer.createEl("button", {
-      text: "Load More",
+      text: "Load more",
     });
     this.loadMoreButton.onclick = () => {
       this.currentLimit += this.batchSize;
@@ -376,24 +363,9 @@ class MermaidIconsSettingTab extends PluginSettingTab {
 
     iconsToShow.forEach((icon) => {
       const card = this.iconsContainer!.createDiv("icon-card");
-      card.style.display = "flex";
-      card.style.flexDirection = "column";
-      card.style.alignItems = "center";
-      card.style.padding = "10px";
-      card.style.border = "1px solid var(--background-modifier-border)";
-      card.style.borderRadius = "4px";
-      card.style.backgroundColor = "var(--background-primary)";
-      card.style.fontSize = "0.8em";
-      card.style.textAlign = "center";
 
       // Icon Wrapper
-      const iconWrapper = card.createDiv();
-      iconWrapper.style.marginBottom = "8px";
-      iconWrapper.style.width = "32px";
-      iconWrapper.style.height = "32px";
-      iconWrapper.style.display = "flex";
-      iconWrapper.style.alignItems = "center";
-      iconWrapper.style.justifyContent = "center";
+      const iconWrapper = card.createDiv("icon-wrapper");
 
       const iconData = this.plugin.getIconData(icon.prefix, icon.name);
       if (iconData && iconData.body) {
@@ -414,24 +386,19 @@ class MermaidIconsSettingTab extends PluginSettingTab {
         const viewBox = `${left} ${top} ${w} ${h}`;
         // Force 32x32 display size
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (iconWrapper as any).innerHTML = svg;
+        // eslint-disable-next-line @microsoft/sdl/no-inner-html
+        iconWrapper.innerHTML = svg;
       } else {
         iconWrapper.setText("?");
       }
 
       // Name
-      const nameSpan = card.createSpan();
+      const nameSpan = card.createSpan("icon-name");
       nameSpan.setText(icon.name);
-      nameSpan.style.fontWeight = "bold";
-      nameSpan.style.wordBreak = "break-all"; // handle long names
 
       // Prefix
-      const prefixSpan = card.createSpan();
+      const prefixSpan = card.createSpan("icon-prefix");
       prefixSpan.setText(icon.prefix);
-      prefixSpan.style.fontSize = "0.8em";
-      prefixSpan.style.color = "var(--text-muted)";
-      prefixSpan.style.marginTop = "4px";
 
       card.title = `${icon.prefix}:${icon.name}`;
     });
@@ -439,9 +406,9 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     // Update Load More Button visibility
     if (this.loadMoreButton) {
       if (this.currentLimit >= this.filteredIcons.length) {
-        this.loadMoreButton.style.display = "none";
+        this.loadMoreButton.setCssProps({ display: "none" });
       } else {
-        this.loadMoreButton.style.display = "inline-block";
+        this.loadMoreButton.setCssProps({ display: "inline-block" });
       }
     }
   }

@@ -14,7 +14,9 @@
     "@typescript-eslint/parser": "^8.47.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-obsidianmd": "^0.1.9",
     "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
     "license-checker": "^25.0.1",
     "obsidian": "^1.8.7",
     "prettier": "^3.6.2",
@@ -26,7 +28,7 @@
     "license": "license-checker --production --out LICENSES.txt --relativeLicensePath",
     "build": "npm run license && vite build",
     "dev": "vite build --watch",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint .",
     "format": "prettier --write src/**/*.ts"
   }
 }
