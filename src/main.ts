@@ -7,6 +7,7 @@ import {
   FuzzySuggestModal,
   Editor,
   MarkdownView,
+  FuzzyMatch,
 } from "obsidian";
 import "../styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -46,6 +47,15 @@ const IconPacks: Array<{ name: string; icons: IconifyJSON }> = [
     icons: lucide as unknown as IconifyJSON,
   },
 ];
+
+function setSvg(el: HTMLElement, svgString: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, "image/svg+xml");
+  if (doc.documentElement && !doc.querySelector("parsererror")) {
+    el.empty();
+    el.appendChild(doc.documentElement);
+  }
+}
 
 // --- Main Plugin Class ---
 export default class MermaidIconsPlugin extends Plugin {
@@ -87,8 +97,7 @@ export default class MermaidIconsPlugin extends Plugin {
             iconSpan.addClass("mermaid-icon-preview-inline");
 
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="16" height="16" preserveAspectRatio="xMidYMid meet" style="width:16px; height:16px; display:block;">${iconData.body}</svg>`;
-            // eslint-disable-next-line @microsoft/sdl/no-inner-html
-            iconSpan.innerHTML = svg;
+            setSvg(iconSpan, svg);
 
             code.parentNode?.insertBefore(iconSpan, code);
           }
@@ -174,8 +183,7 @@ class IconModal extends FuzzySuggestModal<{ prefix: string; name: string }> {
   }
 
   renderSuggestion(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    item: { item: { prefix: string; name: string }; match: any },
+    item: FuzzyMatch<{ prefix: string; name: string }>,
     el: HTMLElement,
   ) {
     super.renderSuggestion(item, el);
@@ -322,11 +330,10 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     });
 
     const licensesEl = containerEl.createEl("textarea", {
+      cls: "license-area",
       attr: {
         readonly: true,
         rows: 15,
-        style:
-          "width: 100%; font-family: monospace; font-size: 12px; resize: vertical;",
       },
     });
     licensesEl.setText(__LICENSE_TEXT__);
@@ -386,8 +393,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
         const viewBox = `${left} ${top} ${w} ${h}`;
         // Force 32x32 display size
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
-        // eslint-disable-next-line @microsoft/sdl/no-inner-html
-        iconWrapper.innerHTML = svg;
+        setSvg(iconWrapper, svg);
       } else {
         iconWrapper.setText("?");
       }

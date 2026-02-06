@@ -81,3 +81,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.license-area {
+  width: 100%;
+  font-family: monospace;
+  font-size: 12px;
+  resize: vertical;
+}
