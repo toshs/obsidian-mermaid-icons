@@ -9,7 +9,7 @@ import {
   MarkdownView,
   FuzzyMatch,
 } from "obsidian";
-import "../styles.css";
+import "./styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
 import { icons as lucide } from "@iconify-json/lucide";
@@ -108,13 +108,6 @@ export default class MermaidIconsPlugin extends Plugin {
     this.addCommand({
       id: "insert-mermaid-icon",
       name: "Insert Mermaid icon",
-      // eslint-disable-next-line obsidianmd/commands/no-default-hotkeys
-      hotkeys: [
-        {
-          modifiers: ["Mod", "Shift"],
-          key: "m",
-        },
-      ],
       editorCallback: (editor: Editor, _view: MarkdownView) => {
         new IconModal(this.app, this, (iconStr) => {
           editor.replaceSelection(iconStr);
@@ -225,8 +218,7 @@ class IconModal extends FuzzySuggestModal<{ prefix: string; name: string }> {
       const top = iconData.top ?? 0;
       const viewBox = `${left} ${top} ${w} ${h}`;
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="32" height="32" preserveAspectRatio="xMidYMid meet" style="width:32px; height:32px; display:block;">${iconData.body}</svg>`;
-      // eslint-disable-next-line @microsoft/sdl/no-inner-html
-      iconContainer.innerHTML = svg;
+      setSvg(iconContainer, svg);
     }
   }
 
@@ -284,7 +276,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
       .setHeading()
       .addDropdown((dropdown) => {
         dropdown.addOption("all", "All");
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises -- Dropdown.onChange callback can be async but here it's simple synchronous logic
         IconPacks.forEach((pack) => dropdown.addOption(pack.name, pack.name));
         dropdown.setValue(this.selectedPack);
         dropdown.onChange((value) => {
