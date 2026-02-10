@@ -6,8 +6,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@iconify-json/logos": "^1.2.9",
-    "@iconify-json/lucide": "^1.2.72",
-    "fuse.js": "^7.1.0"
+    "@iconify-json/lucide": "^1.2.72"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.47.0",

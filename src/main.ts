@@ -8,12 +8,13 @@ import {
   Editor,
   MarkdownView,
   FuzzyMatch,
+  prepareFuzzySearch,
 } from "obsidian";
 import "./styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
 import { icons as lucide } from "@iconify-json/lucide";
-import Fuse from "fuse.js";
+
 
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
@@ -240,7 +241,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   private iconsContainer: HTMLElement | null = null;
   private loadMoreButton: HTMLButtonElement | null = null;
   private searchDebounceTimer: number | null = null;
-  private fuse: Fuse<{ prefix: string; name: string }> | null = null;
+
   private searchInput: HTMLInputElement | null = null; // Keep track of search input
   private selectedPack = "all";
 
@@ -253,10 +254,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   refreshIconList() {
     this.allIcons = this.plugin.getAllIcons();
     this.filteredIcons = this.allIcons;
-    this.fuse = new Fuse(this.allIcons, {
-      keys: ["name", "prefix"],
-      threshold: 0.4,
-    });
+    this.filteredIcons = this.allIcons;
     // Re-apply search if exists
     if (this.searchInput && this.searchInput.value) {
       this.handleSearch(this.searchInput.value);
@@ -300,8 +298,7 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     this.iconsContainer = containerEl.createDiv("icons-grid-container");
 
     // Load More Button
-    const btnContainer = containerEl.createDiv();
-    btnContainer.setCssProps({ "text-align": "center", "margin-top": "10px" });
+    const btnContainer = containerEl.createDiv("mermaid-icon-load-more-container");
 
     this.loadMoreButton = btnContainer.createEl("button", {
       text: "Load more",
@@ -335,8 +332,15 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     let results = this.allIcons;
 
     if (filter) {
-      const fuseResults = this.fuse?.search(filter);
-      results = fuseResults ? fuseResults.map((r) => r.item) : [];
+      const searchFn = prepareFuzzySearch(filter);
+      results = this.allIcons
+        .map((icon) => {
+          const match = searchFn(`${icon.prefix} ${icon.name}`);
+          return { icon, match };
+        })
+        .filter((r) => r.match)
+        .sort((a, b) => (b.match?.score || 0) - (a.match?.score || 0))
+        .map((r) => r.icon);
     }
 
     if (this.selectedPack !== "all") {
@@ -361,10 +365,10 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     );
 
     iconsToShow.forEach((icon) => {
-      const card = this.iconsContainer!.createDiv("icon-card");
+      const card = this.iconsContainer!.createDiv("mermaid-icon-card");
 
       // Icon Wrapper
-      const iconWrapper = card.createDiv("icon-wrapper");
+      const iconWrapper = card.createDiv("mermaid-icon-wrapper");
 
       const iconData = this.plugin.getIconData(icon.prefix, icon.name);
       if (iconData && iconData.body) {
@@ -391,11 +395,11 @@ class MermaidIconsSettingTab extends PluginSettingTab {
       }
 
       // Name
-      const nameSpan = card.createSpan("icon-name");
+      const nameSpan = card.createSpan("mermaid-icon-name");
       nameSpan.setText(icon.name);
 
       // Prefix
-      const prefixSpan = card.createSpan("icon-prefix");
+      const prefixSpan = card.createSpan("mermaid-icon-prefix");
       prefixSpan.setText(icon.prefix);
 
       card.title = `${icon.prefix}:${icon.name}`;
