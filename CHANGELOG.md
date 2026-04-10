@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-04-10
+
+### Added
+- **New Icon Set Support**: Added support for `@iconify-json/clarity` icons.
+- **Documentation**: Added exemplar images and detailed instructions for using the fuzzy search modal.
+
+### Changed
+- **Build System**: Migrated package manager from npm to pnpm and updated GitHub Actions release workflow.
+
 ## [1.1.0] - 2025-12-14
 
 ### Added
