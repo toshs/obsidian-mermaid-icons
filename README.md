@@ -9,8 +9,8 @@ It not only ensures that the default Font Awesome icons render correctly but als
 ## Features
 
 - **Font Awesome Support:** Correctly displays Font Awesome icons in mermaid diagrams, which are defaultly supported by Mermaid but not to be rendered properly in Obsidian.
-- **Expanded Icon Sets:** Adds support for additional icons **pre-bundled with the plugin**, including popular icons, logos, and Lucide icons. (If you want to add more icon sets, please submit a Pull Request!)
-- **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal (`Cmd+Shift+m`).
+- **Expanded Icon Sets:** Adds support for additional icons **pre-bundled with the plugin**, including popular icons, logos, Lucide icons, and Clarity icons. (If you want to add more icon sets, please submit a Pull Request!)
+- **Icon Insertion Helper:** Easily search and insert icons using a fuzzy search modal, accessible via the command palette or a custom hotkey.
 - **Icon Browser:** Browse and filter all supported icons directly from the plugin settings.
 
 ## How to Use
@@ -19,15 +19,22 @@ To include an icon in your Mermaid diagram, use the following syntax:
 
 - `fa[bklrs]?:[icon-name]` for Font Awesome icons.
 - `[prefix]:[icon-name]` for other custom icons.
-  - Supported prefixes: `logos`, `lucide`.
+  - Supported prefixes: `logos`, `lucide`, `clarity`.
 
 ### Insert Icon Command
 
-You can easily insert icons using the "Insert Mermaid Icon" command:
+You can easily insert icons using the "Insert Mermaid Icon" command and its fuzzy search modal. By default, there is no hotkey assigned, but you can set one up in Obsidian's Hotkeys settings (e.g., `Cmd+Shift+m` or `Ctrl+Shift+m`).
 
-1.  Press `Cmd+Shift+m` (or `Ctrl+Shift+m` on Windows/Linux) while in the editor.
-2.  Type to search for an icon.
-3.  Select an icon to insert it into your document.
+![Hotkey settings](./images/example_hotkey_setting.png)
+
+Alternatively, you can open it without a hotkey:
+
+1.  Open the Command Palette (`Cmd+p` or `Ctrl+p`).
+2.  Type "mermaid icon" and select the "Insert Mermaid icon" command.
+3.  Type to search for an icon.
+4.  Select an icon to insert it into your document.
+
+![Fuzzy search modal](./images/example_fuzzy_modal.png)
 
 ### Example
 
@@ -73,7 +80,7 @@ This will render a diagram with the corresponding [SVG Logos Icon sets](https://
 ## Settings
 
 In the plugin settings, you can browse all supported icons under the **Supported icons** section.
-- Use the dropdown to filter by icon set (e.g., `logos`, `lucide`).
+- Use the dropdown to filter by icon set (e.g., `logos`, `lucide`, `clarity`).
 - Use the search bar to find specific icons by name.
 
 ## Installation
@@ -120,3 +127,4 @@ This plugin utilizes the following open-source icon sets. Thank you to their cre
 - **[Iconify](https://iconify.design/)**
   - **[SVG Logos](https://github.com/gilbarbara/logos)** (`logos`): Licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
   - **[Lucide](https://lucide.dev/)** (`lucide`): Licensed under [ISC License](https://opensource.org/licenses/ISC).
+  - **[Clarity](https://clarity.design)** (`clarity`): Licensed under [MIT License](https://opensource.org/licenses/MIT).
