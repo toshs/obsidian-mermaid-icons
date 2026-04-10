@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
+    "@iconify-json/clarity": "^1.2.4",
     "@iconify-json/logos": "^1.2.9",
     "@iconify-json/lucide": "^1.2.72"
   },
@@ -25,7 +26,7 @@
   },
   "scripts": {
     "license": "license-checker --production --out LICENSES.txt --relativeLicensePath",
-    "build": "npm run license && vite build",
+    "build": "pnpm run license && vite build",
     "dev": "vite build --watch",
     "lint": "eslint .",
     "format": "prettier --write src/**/*.ts"
