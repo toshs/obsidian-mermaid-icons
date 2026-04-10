@@ -14,7 +14,7 @@ import "./styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { icons as logos } from "@iconify-json/logos";
 import { icons as lucide } from "@iconify-json/lucide";
-
+import { icons as clarity } from "@iconify-json/clarity";
 
 // This global variable is defined by Vite. We declare it here for TypeScript.
 declare const __LICENSE_TEXT__: string;
@@ -47,6 +47,10 @@ const IconPacks: Array<{ name: string; icons: IconifyJSON }> = [
     name: lucide.prefix,
     icons: lucide as unknown as IconifyJSON,
   },
+  {
+    name: clarity.prefix,
+    icons: clarity as unknown as IconifyJSON,
+  },
 ];
 
 function setSvg(el: HTMLElement, svgString: string) {
@@ -72,7 +76,7 @@ export default class MermaidIconsPlugin extends Plugin {
       const codeBlocks = element.querySelectorAll("code");
       codeBlocks.forEach((code) => {
         const text = code.textContent || "";
-        const matches = text.matchAll(/(logos|lucide):([\w-]+)/g);
+        const matches = text.matchAll(/(logos|lucide|clarity):([\w-]+)/g);
         for (const match of matches) {
           const prefix = match[1];
           const name = match[2];
@@ -298,7 +302,9 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     this.iconsContainer = containerEl.createDiv("icons-grid-container");
 
     // Load More Button
-    const btnContainer = containerEl.createDiv("mermaid-icon-load-more-container");
+    const btnContainer = containerEl.createDiv(
+      "mermaid-icon-load-more-container",
+    );
 
     this.loadMoreButton = btnContainer.createEl("button", {
       text: "Load more",
