@@ -9,8 +9,8 @@
 ## 主な機能
 
 -   **Font Awesomeサポート:** MermaidでデフォルトでサポートされていながらObsidianでは正しく表示されないFont Awesomeアイコンを正常に表示します。
--   **拡張アイコンセット:** 人気のアイコンやロゴ、Lucideアイコンなど、**プラグインに同梱された**追加のアイコンをサポートします。（他のアイコンセットを追加したい場合は、Pull Requestを送ってください！）
--   **アイコン入力支援:** ファジー検索モーダル (`Cmd+Shift+m`) を使用して、アイコンを簡単に検索・挿入できます。
+-   **拡張アイコンセット:** 人気のアイコンやロゴ、Lucideアイコン、Clarityアイコンなど、**プラグインに同梱された**追加のアイコンをサポートします。（他のアイコンセットを追加したい場合は、Pull Requestを送ってください！）
+-   **アイコン入力支援:** ファジー検索モーダルを使用して、アイコンを簡単に検索・挿入できます（コマンドパレットや任意のホットキーから呼び出し可能）。
 -   **アイコンブラウザ:** プラグイン設定画面から、サポートされているすべてのアイコンを閲覧・フィルタリングできます。
 
 ## 使い方
@@ -19,15 +19,22 @@ Mermaidダイアグラムにアイコンを含めるには、次の構文を使�
 
 -   Font Awesomeアイコンの場合: `fa[bklrs]?:[icon-name]`
 -   その他のカスタムアイコンの場合: `[prefix]:[icon-name]`
-    -   サポートされているプレフィックス: `logos`, `lucide`
+    -   サポートされているプレフィックス: `logos`, `lucide`, `clarity`
 
 ### アイコン挿入コマンド
 
-「Insert Mermaid Icon」コマンドを使用して、簡単にアイコンを挿入できます。
+「Insert Mermaid Icon」コマンドとファジー検索モーダルを使用して、簡単にアイコンを挿入できます。デフォルトではホットキーは割り当てられていませんが、Obsidianのホットキー設定で設定可能です（例: `Cmd+Shift+m` や `Ctrl+Shift+m`）。
 
-1.  エディタ内で `Cmd+Shift+m` (Windows/Linuxの場合は `Ctrl+Shift+m`) を押します。
-2.  アイコン名を入力して検索します。
-3.  アイコンを選択してドキュメントに挿入します。
+![ホットキー設定](./images/example_hotkey_setting.png)
+
+または、ホットキーを設定せずに開くこともできます。
+
+1.  コマンドパレットを開きます（`Cmd+p` または `Ctrl+p`）。
+2.  「mermaid icon」と入力し、「Insert Mermaid icon」コマンドを選択します。
+3.  アイコンを入力して検索します。
+4.  アイコンを選択してドキュメントに挿入します。
+
+![ファジー検索モーダル](./images/example_fuzzy_modal.png)
 
 ### 使用例
 
@@ -72,7 +79,7 @@ architecture-beta
 ## 設定
 
 プラグイン設定の **Supported icons** セクションで、サポートされているすべてのアイコンを閲覧できます。
--   ドロップダウンを使用して、アイコンセット（例: `logos`, `lucide`）でフィルタリングできます。
+-   ドロップダウンを使用して、アイコンセット（例: `logos`, `lucide`, `clarity`）でフィルタリングできます。
 -   検索バーを使用して、名前で特定のアイコンを検索できます。
 
 ## インストール方法
@@ -118,3 +125,4 @@ architecture-beta
 -   **[Iconify](https://iconify.design/)**
     -   **[SVG Logos](https://github.com/gilbarbara/logos)** (`logos`): [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) ライセンス
     -   **[Lucide](https://lucide.dev/)** (`lucide`): [ISC License](https://opensource.org/licenses/ISC) ライセンス
+    -   **[Clarity](https://clarity.design)** (`clarity`): [MIT License](https://opensource.org/licenses/MIT) ライセンス

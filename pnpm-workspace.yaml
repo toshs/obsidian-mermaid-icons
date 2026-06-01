@@ -1,0 +1,6 @@
+registries:
+  default: https://npm.flatt.tech/
+minimumReleaseAge: 10080
+trustPolicies: no-downgrade
+lockfileIncludeTarballUrl: true
+blockExoticSubdeps: true
