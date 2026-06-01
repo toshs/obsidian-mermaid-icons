@@ -4,3 +4,7 @@ minimumReleaseAge: 10080
 trustPolicies: no-downgrade
 lockfileIncludeTarballUrl: true
 blockExoticSubdeps: true
+allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
