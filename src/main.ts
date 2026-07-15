@@ -9,6 +9,8 @@ import {
   MarkdownView,
   FuzzyMatch,
   prepareFuzzySearch,
+  requireApiVersion,
+  type SettingDefinitionItem,
 } from "obsidian";
 import "./styles.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -255,6 +257,32 @@ class MermaidIconsSettingTab extends PluginSettingTab {
     this.refreshIconList();
   }
 
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    if (!requireApiVersion("1.13.0")) {
+      return [];
+    }
+
+    return [
+      {
+        name: "Supported icons",
+        desc: "Browse and filter the icon packs available to Mermaid diagrams.",
+        render: (setting) => {
+          setting.settingEl.addClass("mermaid-icons-settings-container");
+          this.renderSettings(setting.settingEl);
+          return () => {
+            if (this.searchDebounceTimer) {
+              window.clearTimeout(this.searchDebounceTimer);
+            }
+            this.searchDebounceTimer = null;
+            this.searchInput = null;
+            this.iconsContainer = null;
+            this.loadMoreButton = null;
+          };
+        },
+      },
+    ];
+  }
+
   refreshIconList() {
     this.allIcons = this.plugin.getAllIcons();
     this.filteredIcons = this.allIcons;
@@ -270,7 +298,10 @@ class MermaidIconsSettingTab extends PluginSettingTab {
   }
 
   display(): void {
-    const { containerEl } = this;
+    this.renderSettings(this.containerEl);
+  }
+
+  private renderSettings(containerEl: HTMLElement): void {
     containerEl.empty();
 
     new Setting(containerEl)
