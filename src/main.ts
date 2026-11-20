@@ -35,7 +35,8 @@ interface IconifyJSON {
 }
 
 interface Mermaid {
-  registerIconPacks: (packs: { name: string; icons: unknown }[]) => void;
+  // Removed in Obsidian 1.15, which renders Mermaid diagrams with Pele.
+  registerIconPacks?: (packs: { name: string; icons: unknown }[]) => void;
 }
 
 const IconPacks: Array<{ name: string; icons: IconifyJSON }> = [
@@ -64,12 +65,25 @@ function setSvg(el: HTMLElement, svgString: string) {
 
 // --- Main Plugin Class ---
 export default class MermaidIconsPlugin extends Plugin {
-  styleEl: HTMLElement;
+  private peleObserver: MutationObserver | null = null;
 
   async onload() {
     this.addSettingTab(new MermaidIconsSettingTab(this.app, this));
-    const mermaid = (await loadMermaid()) as Mermaid;
-    mermaid.registerIconPacks(IconPacks);
+
+    // Obsidian < 1.15: register the icon packs with Mermaid directly.
+    // Obsidian >= 1.15 uses Pele, which no longer exposes registerIconPacks().
+    // In that case we fill Pele's empty icon placeholders in the rendered SVG.
+    try {
+      const mermaid = (await loadMermaid()) as Mermaid | undefined;
+      if (typeof mermaid?.registerIconPacks === "function") {
+        mermaid.registerIconPacks(IconPacks);
+      } else {
+        this.registerPeleIconFallback();
+      }
+    } catch (error) {
+      console.warn("Mermaid Icons: could not register icon packs.", error);
+      this.registerPeleIconFallback();
+    }
 
     // Register markdown post processor for icon preview
     this.registerMarkdownPostProcessor((element, _context) => {
@@ -122,7 +136,89 @@ export default class MermaidIconsPlugin extends Plugin {
   }
 
   onunload() {
-    // Unload styles and attempt to clean up
+    this.peleObserver?.disconnect();
+    this.peleObserver = null;
+  }
+
+  /**
+   * Pele (Obsidian >= 1.15) renders unsupported icon names as an empty
+   * <svg class="pele-icon" data-icon="prefix:name"> element. Fill those
+   * placeholders from the icon packs bundled with this plugin.
+   */
+  private registerPeleIconFallback() {
+    if (!document.body || this.peleObserver) return;
+
+    this.processPeleIcons(document.body);
+
+    this.peleObserver = new MutationObserver((records) => {
+      for (const record of records) {
+        record.addedNodes.forEach((node) => this.processPeleNode(node));
+      }
+    });
+    this.peleObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+    this.register(() => {
+      this.peleObserver?.disconnect();
+      this.peleObserver = null;
+    });
+  }
+
+  private processPeleNode(node: Node) {
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const element = node as Element;
+    if (
+      element.matches(
+        "svg.pele-icon[data-icon]:not([data-mermaid-icons-filled])",
+      )
+    ) {
+      const name = element.getAttribute("data-icon");
+      if (name) this.fillPeleIcon(element as SVGElement, name);
+    }
+    this.processPeleIcons(element);
+  }
+
+  private processPeleIcons(root: ParentNode) {
+    const placeholders = root.querySelectorAll<SVGElement>(
+      "svg.pele-icon[data-icon]:not([data-mermaid-icons-filled])",
+    );
+    placeholders.forEach((svg) => {
+      const name = svg.getAttribute("data-icon");
+      if (name) this.fillPeleIcon(svg, name);
+    });
+  }
+
+  private fillPeleIcon(svg: SVGElement, name: string) {
+    const separator = name.indexOf(":");
+    if (separator < 1) return;
+
+    const icon = this.getIconData(
+      name.slice(0, separator),
+      name.slice(separator + 1),
+    );
+    if (!icon?.body) return;
+
+    const width = icon.width || 24;
+    const height = icon.height || 24;
+    const viewBox = `${icon.left ?? 0} ${icon.top ?? 0} ${width} ${height}`;
+    const doc = new DOMParser().parseFromString(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${icon.body}</svg>`,
+      "image/svg+xml",
+    );
+    if (doc.querySelector("parsererror") || !doc.documentElement) return;
+
+    svg.setAttribute("viewBox", viewBox);
+    svg.setAttribute("fill", "currentColor");
+    svg.removeAttribute("stroke");
+    svg.removeAttribute("stroke-width");
+    svg.removeAttribute("stroke-linecap");
+    svg.removeAttribute("stroke-linejoin");
+    svg.empty();
+    Array.from(doc.documentElement.childNodes).forEach((child) => {
+      svg.appendChild(document.importNode(child, true));
+    });
+    svg.setAttribute("data-mermaid-icons-filled", "true");
   }
 
   getAllIcons() {
